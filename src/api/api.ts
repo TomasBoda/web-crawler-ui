@@ -1,6 +1,12 @@
 import axios from "axios";
 import { print } from "graphql";
-import {AddWebsiteQuery, GetWebsiteQuery, GetWebsitesQuery, UpdateWebsiteQuery} from "@/api/model";
+import {
+    AddWebsiteQuery,
+    GetWebsiteNodesQuery,
+    GetWebsiteQuery,
+    GetWebsitesQuery,
+    UpdateWebsiteQuery
+} from "@/api/model";
 import { Website } from "@/model/model";
 
 export const API_URL = "http://195.113.19.168:3000/graphql";
@@ -30,4 +36,12 @@ export async function addWebsiteQuery(params: Website) {
 
 export async function updateWebsiteQuery(params: Website) {
     return await query(UpdateWebsiteQuery, params);
+}
+
+export async function crawlWebsiteQuery(id: string) {
+    return await query(UpdateWebsiteQuery, { id });
+}
+
+export async function getWebsiteNodesQuery(webPages: string[]) {
+    return await query(GetWebsiteNodesQuery, { webPages });
 }

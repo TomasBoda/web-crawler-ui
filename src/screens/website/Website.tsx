@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import React from "react";
 import { Container, InputField, Panel, Heading, Text, TagList, TagItem, RemoveIcon, Label } from "@/components/Components";
 import Title from "@/components/Title";
 import { Website } from "@/model/model";
@@ -6,14 +7,20 @@ import { getFormattedURL } from "@/utils/utils";
 import Toggle from "@/components/Toggle";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
+import dynamic from "next/dynamic";
+import {crawlWebsiteQuery} from "@/api/api";
+const Graph = dynamic(() => import("./Graph"), { ssr: false });
 
 interface Props {
     website: Website;
+    nodes: any[];
 }
 
 export default function Website(props: Props) {
 
-    const { website } = props;
+    const { website, nodes } = props;
+
+    const [loaded, setLoaded] = useState(false);
 
     const [showingInfo, setShowingInfo] = useState(false);
     const [updated, setUpdated] = useState(false);
@@ -25,6 +32,8 @@ export default function Website(props: Props) {
     const [tag, setTag] = useState("");
     const [tags, setTags] = useState(website.tags);
     const [active, setActive] = useState(website.active);
+
+    useEffect(() => setLoaded(true), [])
 
     useEffect(() => {
         if (tags.length !== website.tags.length) {
@@ -49,6 +58,12 @@ export default function Website(props: Props) {
         }
     }, [url, label, regexp, tags, active]);
 
+    function deleteWebsite() {}
+
+    async function crawlWebsite() {
+        await crawlWebsiteQuery(website.id ?? website.identifier);
+    }
+
     function addTag(event) {
         if (event.key !== "Enter" || tag.trim() === "" || tags.includes(tag.trim().toLowerCase())) {
             return;
@@ -62,6 +77,28 @@ export default function Website(props: Props) {
         const newTags = [ ...tags ];
         newTags.splice(index, 1);
         setTags(newTags);
+    }
+
+    function getGraphData() {
+        function getGraphNodes() {
+            return nodes.map(node => ({
+                id: node.id,
+                label: node.url
+            }));
+        }
+
+        function getGraphsEdges() {
+            return nodes.filter(node => node.parentId).map(node => ({
+                id: node.id + node.parentId,
+                source: node.parentId,
+                target: node.id
+            }))
+        }
+
+        return {
+            nodes: getGraphNodes(),
+            edges: getGraphsEdges()
+        }
     }
 
     return (
@@ -131,6 +168,11 @@ export default function Website(props: Props) {
                     </Content>
                 }
             </Panel>
+
+            <GraphPanel>
+                <Heading>Graph</Heading>
+                <Graph data={getGraphData()} />
+            </GraphPanel>
         </Container>
     )
 }
@@ -172,4 +214,12 @@ const ButtonBar = styled.div`
   gap: 10px;
   
   margin-top: 30px;
+`;
+
+const GraphPanel = styled(Panel)`
+  width: 100%;
+  max-width: 100%;
+  height: 500px;
+  
+  position: relative;
 `;

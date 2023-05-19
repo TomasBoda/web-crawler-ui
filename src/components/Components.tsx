@@ -27,6 +27,8 @@ export const Text = styled.p`
   line-height: 170%;
   
   opacity: 0.5;
+  
+  margin-bottom: 15px;
 `;
 
 export const InputField = styled.input`
