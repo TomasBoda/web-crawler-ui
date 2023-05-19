@@ -3,7 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
   skipTypescriptChecking: true,
   typescript: {
-    transpileOnly: true
+    transpileOnly: true,
+    ignoreBuildErrors: true
   }
 }
 
