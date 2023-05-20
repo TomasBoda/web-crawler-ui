@@ -5,6 +5,7 @@ type ButtonSize = "large" | "small";
 type ButtonType = "primary" | "secondary" | "warn";
 
 interface Props {
+    id?: string;
     children: any;
     href?: string;
     type?: ButtonType;
@@ -23,6 +24,7 @@ export default function Button(props: Props) {
     if (href) {
         return (
             <StyledLinkButton
+                id={props.id}
                 type={type}
                 size={size}
                 href={href}
@@ -34,6 +36,7 @@ export default function Button(props: Props) {
 
     return (
         <StyledButton
+            id={props.id}
             type={type}
             size={size}
             onClick={onClick}

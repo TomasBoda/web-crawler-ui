@@ -8,7 +8,11 @@ import Toggle from "@/components/Toggle";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import dynamic from "next/dynamic";
-import {crawlWebsiteQuery} from "@/api/api";
+import {crawlWebsiteQuery, deleteWebsiteQuery} from "@/api/api";
+import {GraphData, GraphEdge, GraphNode} from "@/screens/website/Graph";
+import {useRouter} from "next/router";
+import {hideLoading, showLoading} from "@/components/Loading";
+import {showDialog} from "@/components/Dialog";
 const Graph = dynamic(() => import("./Graph"), { ssr: false });
 
 interface Props {
@@ -17,6 +21,8 @@ interface Props {
 }
 
 export default function Website(props: Props) {
+
+    const router = useRouter();
 
     const { website, nodes } = props;
 
@@ -58,10 +64,51 @@ export default function Website(props: Props) {
         }
     }, [url, label, regexp, tags, active]);
 
-    function deleteWebsite() {}
+    async function updateWebsite() {
+
+    }
 
     async function crawlWebsite() {
         await crawlWebsiteQuery(website.id ?? website.identifier);
+    }
+
+    async function deleteWebsite() {
+        showLoading();
+
+        const response = await deleteWebsiteQuery(website.id ?? website.identifier);
+        const result = response?.data?.data?.deleteWebsite ?? null;
+
+        const status = result?.status ?? null;
+        const message = result?.message ?? null;
+
+        if (message === "Website deleted successfully" && status === 200) {
+            hideLoading();
+            showDialog({
+                heading: "Website deleted",
+                text: "The website was successfully deleted from your domain list. All the corresponding data was deleted as well.",
+                primary: {
+                    label: "See websites",
+                    onClick: () => router.push("/websites")
+                },
+                secondary: {
+                    label: "Cancel",
+                    onClick: () => router.reload()
+                }
+            });
+        } else {
+            showDialog({
+                heading: "Error deleting website",
+                text: "The website couldn't be deleted from your websites list. Please try again later.",
+                primary: {
+                    label: "See websites",
+                    onClick: () => router.push("/websites")
+                },
+                secondary: {
+                    label: "Cancel",
+                    onClick: () => router.reload()
+                }
+            });
+        }
     }
 
     function addTag(event) {
@@ -77,28 +124,6 @@ export default function Website(props: Props) {
         const newTags = [ ...tags ];
         newTags.splice(index, 1);
         setTags(newTags);
-    }
-
-    function getGraphData() {
-        function getGraphNodes() {
-            return nodes.map(node => ({
-                id: node.id,
-                label: node.url
-            }));
-        }
-
-        function getGraphsEdges() {
-            return nodes.filter(node => node.parentId).map(node => ({
-                id: node.id + node.parentId,
-                source: node.parentId,
-                target: node.id
-            }))
-        }
-
-        return {
-            nodes: getGraphNodes(),
-            edges: getGraphsEdges()
-        }
     }
 
     return (
@@ -171,7 +196,7 @@ export default function Website(props: Props) {
 
             <GraphPanel>
                 <Heading>Graph</Heading>
-                <Graph data={getGraphData()} />
+                <Graph nodes={nodes} />
             </GraphPanel>
         </Container>
     )
@@ -219,7 +244,7 @@ const ButtonBar = styled.div`
 const GraphPanel = styled(Panel)`
   width: 100%;
   max-width: 100%;
-  height: 500px;
+  height: 700px;
   
   position: relative;
 `;

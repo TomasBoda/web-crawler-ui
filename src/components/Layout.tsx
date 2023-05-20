@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Menu from "@/components/Menu";
 import Loading from "@/components/Loading";
+import Dialog from "@/components/Dialog";
 
 export default function Layout({ children }) {
     return (
@@ -9,6 +10,7 @@ export default function Layout({ children }) {
                 <Menu />
 
                 <Loading />
+                <Dialog />
 
                 {children}
             </Main>

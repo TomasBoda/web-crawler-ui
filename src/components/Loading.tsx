@@ -1,34 +1,42 @@
 import styled from "styled-components";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 
 export default function Loading() {
 
     const router = useRouter();
 
-    const [loading, setLoading] = useState(false);
-
     useEffect(() => {
         router.events.on("routeChangeStart", () => {
-            setLoading(true);
+            showLoading();
         });
 
         router.events.on("routeChangeComplete", () => {
-            setLoading(false);
+            hideLoading();
         });
 
         return () => {
             router.events.off("routeChangeComplete", () => {
-                setLoading(false);
+                hideLoading();
             });
         };
     }, [router.events]);
 
-    return loading && (
-        <Container>
+    return (
+        <Container id="loading">
             <Loader />
         </Container>
     )
+}
+
+export function showLoading() {
+    let loading = document.getElementById("loading");
+    loading.style.display = "inline-block";
+}
+
+export function hideLoading() {
+    let loading = document.getElementById("loading");
+    loading.style.display = "none";
 }
 
 const Container = styled.div`
@@ -40,6 +48,8 @@ const Container = styled.div`
   height: 3px;
   
   overflow: hidden;
+  
+  display: none;
 `
 
 const Loader = styled.div`

@@ -44,6 +44,15 @@ export const UpdateWebsiteQuery = gql`
     }
 `;
 
+export const DeleteWebsiteQuery = gql`
+    mutation deleteWebsite($id: ID!) {
+        deleteWebsite(id: $id) {
+            message
+            status
+        }
+    }
+`;
+
 export const GetWebsiteNodesQuery = gql`
     query nodes($webPages: [ID!]!) {
         nodes(webPages: $webPages) {

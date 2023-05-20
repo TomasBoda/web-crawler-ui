@@ -1,7 +1,7 @@
 import axios from "axios";
 import { print } from "graphql";
 import {
-    AddWebsiteQuery,
+    AddWebsiteQuery, DeleteWebsiteQuery,
     GetWebsiteNodesQuery,
     GetWebsiteQuery,
     GetWebsitesQuery,
@@ -36,6 +36,10 @@ export async function addWebsiteQuery(params: Website) {
 
 export async function updateWebsiteQuery(params: Website) {
     return await query(UpdateWebsiteQuery, params);
+}
+
+export async function deleteWebsiteQuery(id: string) {
+    return await query(DeleteWebsiteQuery, { id });
 }
 
 export async function crawlWebsiteQuery(id: string) {

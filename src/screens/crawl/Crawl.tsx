@@ -6,17 +6,22 @@ import { Container, Label, Heading, Text, InputField, Panel, TagList, TagItem, R
 import Button from "@/components/Button";
 import { addWebsiteQuery } from "@/api/api";
 import { Website } from "@/model/model";
+import {useRouter} from "next/router";
+import {hideLoading, showLoading} from "@/components/Loading";
+import {showDialog} from "@/components/Dialog";
 
 const defaultValues: Website = {
     url: "https://tomasboda.dev",
-    label: "Portfolio website",
-    regexp: "",
-    periodicity: 15,
-    tags: [ "tag1", "tag2" ],
+    label: "",
+    regexp: ".*",
+    periodicity: 3600,
+    tags: [],
     active: true
 }
 
 export default function Crawl() {
+
+    const router = useRouter();
 
     const [advanced, setAdvanced] = useState(true);
 
@@ -29,8 +34,43 @@ export default function Crawl() {
     const [active, setActive] = useState(defaultValues.active);
 
     async function addWebsite() {
-        const result = await addWebsiteQuery({ label, url, regexp, periodicity, tags, active });
-        console.log(result);
+        showLoading();
+
+        const params = { label, url, regexp: encodeURIComponent(regexp), periodicity, tags, active };
+        const response = await addWebsiteQuery(params);
+        const result = response?.data?.data?.addWebsite ?? null;
+
+        const status = result?.status ?? null;
+        const message = result?.message ?? null;
+
+        if (message === "Website added successfully" && status === 200) {
+            hideLoading();
+            showDialog({
+                heading: "Website added",
+                text: "New website was added successfully to your websites list. If you selected active, the website will be crawled as soon as possible.",
+                primary: {
+                    label: "See websites",
+                    onClick: () => router.push("/websites")
+                },
+                secondary: {
+                    label: "Cancel",
+                    onClick: () => router.reload()
+                }
+            });
+        } else {
+            showDialog({
+                heading: "Error adding website",
+                text: "The website couldn't be added to your websites list. Please try again later.",
+                primary: {
+                    label: "See websites",
+                    onClick: () => router.push("/websites")
+                },
+                secondary: {
+                    label: "Cancel",
+                    onClick: () => router.reload()
+                }
+            });
+        }
     }
 
     function addTag(event) {
