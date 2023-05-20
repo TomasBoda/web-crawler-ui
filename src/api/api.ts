@@ -1,7 +1,7 @@
 import axios from "axios";
 import { print } from "graphql";
 import {
-    AddWebsiteQuery, DeleteWebsiteQuery,
+    AddWebsiteQuery, DeleteWebsiteQuery, GetExecutionsQuery, GetWebsiteCrawlingQuery,
     GetWebsiteNodesQuery,
     GetWebsiteQuery,
     GetWebsitesQuery,
@@ -26,8 +26,16 @@ export async function getWebsiteQuery(webPageId: string) {
     return await query(GetWebsiteQuery, { webPageId });
 }
 
+export async function getWebsiteCrawlingQuery(webPageId: string) {
+    return await query(GetWebsiteCrawlingQuery, { webPageId });
+}
+
 export async function getWebsitesQuery() {
-    return await query(GetWebsitesQuery);
+    return await query(GetWebsitesQuery, {});
+}
+
+export async function getExecutionsQuery() {
+    return await query(GetExecutionsQuery);
 }
 
 export async function addWebsiteQuery(params: Website) {

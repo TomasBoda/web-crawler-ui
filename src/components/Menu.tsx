@@ -7,6 +7,7 @@ export default function Menu() {
             <Heading>Crawler</Heading>
             <Item href="/">Dashboard</Item>
             <Item href="/websites">Websites</Item>
+            <Item href="/executions">Executions</Item>
             <ButtonItem href="/crawl">Crawl</ButtonItem>
         </Container>
     )

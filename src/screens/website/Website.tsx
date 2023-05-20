@@ -8,7 +8,7 @@ import Toggle from "@/components/Toggle";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import dynamic from "next/dynamic";
-import {crawlWebsiteQuery, deleteWebsiteQuery} from "@/api/api";
+import {crawlWebsiteQuery, deleteWebsiteQuery, getWebsiteCrawlingQuery} from "@/api/api";
 import {GraphData, GraphEdge, GraphNode} from "@/screens/website/Graph";
 import {useRouter} from "next/router";
 import {hideLoading, showLoading} from "@/components/Loading";
@@ -26,10 +26,10 @@ export default function Website(props: Props) {
 
     const { website, nodes } = props;
 
-    const [loaded, setLoaded] = useState(false);
-
-    const [showingInfo, setShowingInfo] = useState(false);
+    const [showingInfo, setShowingInfo] = useState(true);
     const [updated, setUpdated] = useState(false);
+
+    const [crawling, setCrawling] = useState(website.crawling);
 
     const [url, setUrl] = useState(website.url);
     const [label, setLabel] = useState(website.label);
@@ -39,7 +39,21 @@ export default function Website(props: Props) {
     const [tags, setTags] = useState(website.tags);
     const [active, setActive] = useState(website.active);
 
-    useEffect(() => setLoaded(true), [])
+    let crawlingInterval;
+
+    useEffect(() => {
+        startCheckingCrawling();
+
+        return () => clearInterval(crawlingInterval);
+    }, []);
+
+    function startCheckingCrawling() {
+        crawlingInterval = setInterval(async () => {
+            const response = await getWebsiteCrawlingQuery(website.identifier ?? website.id);
+            const crawling = response?.data?.data?.website?.crawling;
+            setCrawling(crawling);
+        }, 1000);
+    }
 
     useEffect(() => {
         if (tags.length !== website.tags.length) {
@@ -68,8 +82,38 @@ export default function Website(props: Props) {
 
     }
 
+    function tryCrawlWebsite() {
+        showDialog({
+           heading: "Crawl website",
+           text: "Do you really want to recrawl this website? This action will force the crawling and the website will be recrawled instantly.",
+           primary: {
+               label: "Crawl",
+               onClick: () => crawlWebsite()
+           },
+            secondary: {
+               label: "Cancel",
+                onClick: () => router.reload()
+            }
+        });
+    }
+
     async function crawlWebsite() {
         await crawlWebsiteQuery(website.id ?? website.identifier);
+    }
+
+    function tryDeleteWebsite() {
+        showDialog({
+            heading: "Delete website",
+            text: "Do you really want to delete this website? All the corresponding data will be deleted as well.",
+            primary: {
+                label: "Delete",
+                onClick: () => deleteWebsite()
+            },
+            secondary: {
+                label: "Cancel",
+                onClick: () => router.reload()
+            }
+        });
     }
 
     async function deleteWebsite() {
@@ -92,7 +136,7 @@ export default function Website(props: Props) {
                 },
                 secondary: {
                     label: "Cancel",
-                    onClick: () => router.reload()
+                    onClick: () => router.push("/websites")
                 }
             });
         } else {
@@ -134,8 +178,8 @@ export default function Website(props: Props) {
             </Title>
 
             <ButtonBar>
-                <Button type="primary" size="small" onClick={() => crawlWebsite()}>Crawl</Button>
-                <Button type="warn" size="small" onClick={() => deleteWebsite()}>Delete</Button>
+                <Button type="primary" size="small" onClick={() => tryCrawlWebsite()}>Crawl</Button>
+                <Button type="warn" size="small" onClick={() => tryDeleteWebsite()}>Delete</Button>
             </ButtonBar>
 
             <Panel>
@@ -143,6 +187,11 @@ export default function Website(props: Props) {
                 <Text>
                     This section shows general information about the given website. To update website information, edit desired fields and click on the update button;
                 </Text>
+
+                <Crawling>
+                    <Active active={crawling} title="Active (website is crawled actively)" />
+                    Crawling status: {crawling ? "Currently crawling..." : "Idle"}
+                </Crawling>
 
                 <Label onClick={() => setShowingInfo(!showingInfo)}>
                     {showingInfo ? "Hide website information" : "Website information"}
@@ -201,6 +250,19 @@ export default function Website(props: Props) {
         </Container>
     )
 }
+
+const Crawling = styled.p`
+  color: black;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 100%;
+  
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  
+  margin: 10px 0px 30px 0px;
+`;
 
 const Active = styled.span`
   width: 15px;

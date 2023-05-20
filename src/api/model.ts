@@ -1,5 +1,15 @@
 import gql from "graphql-tag";
 
+export const GetExecutionsQuery = gql`
+    query executions($limit: Int, $offset: Int) {
+        executions(limit: $limit, offset: $offset) {
+            id
+            pageid
+            timestamp
+        }
+    }
+`
+
 export const GetWebsitesQuery = gql`
     query {
         websites {
@@ -22,9 +32,18 @@ export const GetWebsiteQuery = gql`
             regexp
             tags
             active
+            crawling
         }
     }
 `;
+
+export const GetWebsiteCrawlingQuery = gql`
+    query website($webPageId: ID!) {
+        website(webPageId: $webPageId) {
+            crawling
+        }
+    }
+`
 
 export const AddWebsiteQuery = gql`
     mutation addWebsite($label: String!, $url: String!, $regexp: String!, $periodicity: Int!, $tags: [String!]!, $active: Boolean!) {

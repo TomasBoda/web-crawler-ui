@@ -12,7 +12,7 @@ export default function Dialog() {
 
                 <ButtonPanel>
                     <Button id="dialog-button-primary" type="primary" size="small"></Button>
-                    <Button id="dialog-button-secondary" type="secondary" size="small"></Button>
+                    <Button id="dialog-button-secondary" type="warn" size="small"></Button>
                 </ButtonPanel>
             </Panel>
         </Container>
