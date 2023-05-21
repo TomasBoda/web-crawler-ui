@@ -27,3 +27,25 @@ export function getFormattedURL(url: string): string {
 
     return withoutPrefix.substring(0, slashIndex);
 }
+
+export function getDateTime(dateTime: string) {
+    const parts = dateTime.split(" ");
+    const date = parts[0];
+    const time = parts[1];
+
+    let year = date.split("-")[0];
+    let month = date.split("-")[1];
+    let day = date.split("-")[2];
+
+    let hours = time.split(":")[0];
+    let minutes = time.split(":")[1];
+    let seconds = time.split(":")[2];
+
+    if (month.length === 1) month = "0" + month;
+    if (day.length === 1) day = "0" + day;
+    if (hours.length === 1) hours = "0" + hours;
+    if (minutes.length === 1) minutes = "0" + minutes;
+    if (seconds.length === 1) seconds = "0" + seconds;
+
+    return `${hours}:${minutes}:${seconds} | ${day}.${month}.${year}`;
+}

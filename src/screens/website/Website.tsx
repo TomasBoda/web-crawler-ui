@@ -2,34 +2,43 @@ import styled from "styled-components";
 import React from "react";
 import { Container, InputField, Panel, Heading, Text, TagList, TagItem, RemoveIcon, Label } from "@/components/Components";
 import Title from "@/components/Title";
-import { Website } from "@/model/model";
-import { getFormattedURL } from "@/utils/utils";
+import {Execution as ExecutionModel, Website} from "@/model/model";
+import {getDateTime, getFormattedURL} from "@/utils/utils";
 import Toggle from "@/components/Toggle";
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import dynamic from "next/dynamic";
-import {crawlWebsiteQuery, deleteWebsiteQuery, getWebsiteCrawlingQuery} from "@/api/api";
-import {GraphData, GraphEdge, GraphNode} from "@/screens/website/Graph";
+import {
+    addWebsiteQuery,
+    crawlWebsiteQuery,
+    deleteWebsiteQuery,
+    getWebsiteCrawlingQuery,
+    updateWebsiteQuery
+} from "@/api/api";
+import {GraphData, GraphEdge, GraphNode} from "@/screens/website/components/Graph";
 import {useRouter} from "next/router";
 import {hideLoading, showLoading} from "@/components/Loading";
 import {showDialog} from "@/components/Dialog";
-const Graph = dynamic(() => import("./Graph"), { ssr: false });
+import web from "react-use-measure/src/web";
+import {time} from "ionicons/icons";
+import Node from "@/screens/website/components/Node";
+import Execution from "@/screens/website/components/Execution";
+const Graph = dynamic(() => import("./components/Graph"), { ssr: false });
 
 interface Props {
     website: Website;
     nodes: any[];
+    executions: ExecutionModel[];
 }
 
 export default function Website(props: Props) {
 
     const router = useRouter();
 
-    const { website, nodes } = props;
+    const { website, nodes, executions } = props;
 
-    const [showingInfo, setShowingInfo] = useState(true);
+    const [showingInfo, setShowingInfo] = useState(false);
     const [updated, setUpdated] = useState(false);
-
-    const [crawling, setCrawling] = useState(website.crawling);
 
     const [url, setUrl] = useState(website.url);
     const [label, setLabel] = useState(website.label);
@@ -38,6 +47,10 @@ export default function Website(props: Props) {
     const [tag, setTag] = useState("");
     const [tags, setTags] = useState(website.tags);
     const [active, setActive] = useState(website.active);
+    const [crawling, setCrawling] = useState(website.crawling);
+    const [timestamp, setTimestamp] = useState(website.timestamp);
+
+    const [mode, setMode] = useState("nodes");
 
     let crawlingInterval;
 
@@ -71,15 +84,53 @@ export default function Website(props: Props) {
         if (url.trim() !== website.url ||
             label.trim() !== website.label ||
             regexp.trim() !== website.regexp ||
+            periodicity !== website.periodicity ||
             active !== website.active) {
             setUpdated(true);
         } else {
             setUpdated(false);
         }
-    }, [url, label, regexp, tags, active]);
+    }, [url, label, regexp, periodicity, tags, active]);
 
     async function updateWebsite() {
+        showLoading();
 
+        const params = { id: website.id ?? website.identifier, label, url, regexp: encodeURIComponent(regexp), periodicity, tags, active };
+        const response = await updateWebsiteQuery(params);
+        const result = response?.data?.data?.updateWebsite ?? null;
+
+        const status = result?.status ?? null;
+        const message = result?.message ?? null;
+
+        hideLoading();
+
+        if (message === "Website updated successfully" && status === 200) {
+            showDialog({
+                heading: "Website updated",
+                text: "Website was updated successfully. The website will be recrawled automatically at this moment.",
+                primary: {
+                    label: "Reload",
+                    onClick: () => router.reload()
+                },
+                secondary: {
+                    label: "Cancel",
+                    onClick: () => hideLoading()
+                }
+            });
+        } else {
+            showDialog({
+                heading: "Error adding website",
+                text: "The website couldn't be added to your websites list. Please try again later.",
+                primary: {
+                    label: "See websites",
+                    onClick: () => router.push("/websites")
+                },
+                secondary: {
+                    label: "Cancel",
+                    onClick: () => router.reload()
+                }
+            });
+        }
     }
 
     function tryCrawlWebsite() {
@@ -190,7 +241,7 @@ export default function Website(props: Props) {
 
                 <Crawling>
                     <Active active={crawling} title="Active (website is crawled actively)" />
-                    Crawling status: {crawling ? "Currently crawling..." : "Idle"}
+                    Crawling status: {crawling ? "Currently crawling..." : "Idle"} (last recrawl at {getDateTime(timestamp)})
                 </Crawling>
 
                 <Label onClick={() => setShowingInfo(!showingInfo)}>
@@ -204,7 +255,7 @@ export default function Website(props: Props) {
                             <InputField type="text" value={website.identifier} disabled={true}></InputField>
 
                             <Param>URL</Param>
-                            <InputField type="text" value={url} onChange={e => setUrl(e.target.value)}></InputField>
+                            <InputField type="text" value={url} onChange={e => setUrl(e.target.value)} disabled={true}></InputField>
 
                             <Param>Label</Param>
                             <InputField type="text" placeholder="Enter website label" value={label}
@@ -213,6 +264,9 @@ export default function Website(props: Props) {
                             <Param>Regexp</Param>
                             <InputField type="text" placeholder="Enter crawling regex" value={regexp}
                                         onChange={e => setRegexp(e.target.value)}></InputField>
+
+                            <Param>Periodicity</Param>
+                            <InputField type="text" value={periodicity} placeholder="Enter crawling periodicity" pattern="[0-9]*" onChange={e => setPeriodicity((value) => e.target.validity.valid ? Number(e.target.value) : value)} />
 
                             <Param>Tags</Param>
                             <InputField type="text" placeholder="Enter a new tag (press Enter)" value={tag}
@@ -243,10 +297,33 @@ export default function Website(props: Props) {
                 }
             </Panel>
 
-            <GraphPanel>
-                <Heading>Graph</Heading>
-                <Graph nodes={nodes} />
-            </GraphPanel>
+            <ButtonBar>
+                <Button type={mode === "graph" ? "primary" : "secondary"} size="small" onClick={() => setMode("graph")}>Graph</Button>
+                <Button type={mode === "nodes" ? "primary" : "secondary"} size="small" onClick={() => setMode("nodes")}>List</Button>
+            </ButtonBar>
+
+            {mode === "graph" &&
+                <GraphPanel>
+                    <Heading>Loading graph...</Heading>
+                    <Graph nodes={nodes}/>
+                </GraphPanel>
+            }
+
+            {mode === "nodes" &&
+                <NodesPanel>
+                    <Heading>List of crawled nodes</Heading>
+                    <List>
+                        {nodes.map(node => <Node node={node} />)}
+                    </List>
+                </NodesPanel>
+            }
+
+            <ExecutionsPanel>
+                <Heading>Executions</Heading>
+                <List>
+                    {executions.map(execution => <Execution execution={execution} />)}
+                </List>
+            </ExecutionsPanel>
         </Container>
     )
 }
@@ -309,4 +386,22 @@ const GraphPanel = styled(Panel)`
   height: 700px;
   
   position: relative;
+`;
+
+const ExecutionsPanel = styled(Panel)`
+  width: 100%;
+  max-width: 100%;
+`;
+
+const NodesPanel = styled(Panel)`
+  width: 100%;
+  max-width: 100%;
+`;
+
+const List = styled.div`
+  width: 100%;
+  
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
 `;

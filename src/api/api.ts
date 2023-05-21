@@ -30,12 +30,14 @@ export async function getWebsiteCrawlingQuery(webPageId: string) {
     return await query(GetWebsiteCrawlingQuery, { webPageId });
 }
 
-export async function getWebsitesQuery() {
-    return await query(GetWebsitesQuery, {});
+interface getWebsitesProps { limit?: number; offset?: number; }
+export async function getWebsitesQuery(props: getWebsitesProps = {}) {
+    return await query(GetWebsitesQuery, props);
 }
 
-export async function getExecutionsQuery() {
-    return await query(GetExecutionsQuery);
+interface getExecutionsProps { limit?: number; offset?: number; webPage?: string; }
+export async function getExecutionsQuery(props: getExecutionsProps = {}) {
+    return await query(GetExecutionsQuery, props);
 }
 
 export async function addWebsiteQuery(params: Website) {

@@ -9,10 +9,11 @@ export interface Website {
     tags?: string[];
     active?: boolean;
     crawling?: boolean;
+    timestamp?: string;
 }
 
 export interface Execution {
     id?: string;
-    pageid?: string;
+    page?: Website;
     timestamp: string;
 }

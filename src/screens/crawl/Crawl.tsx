@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import Toggle from "@/components/Toggle";
 import Title from "@/components/Title";
 import { Container, Label, Heading, Text, InputField, Panel, TagList, TagItem, RemoveIcon } from "@/components/Components";
@@ -33,6 +33,13 @@ export default function Crawl() {
     const [tags, setTags] = useState(defaultValues.tags);
     const [active, setActive] = useState(defaultValues.active);
 
+    useEffect(() => {
+        const { domainUrl } = router.query;
+        if (!domainUrl) return;
+
+        setUrl(decodeURI(domainUrl.toString()));
+    }, []);
+
     async function addWebsite() {
         showLoading();
 
@@ -43,8 +50,9 @@ export default function Crawl() {
         const status = result?.status ?? null;
         const message = result?.message ?? null;
 
+        hideLoading();
+
         if (message === "Website added successfully" && status === 200) {
-            hideLoading();
             showDialog({
                 heading: "Website added",
                 text: "New website was added successfully to your websites list. If you selected active, the website will be crawled as soon as possible.",

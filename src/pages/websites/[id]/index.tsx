@@ -1,12 +1,12 @@
-import {getWebsiteNodesQuery, getWebsiteQuery} from "@/api/api";
+import {getExecutionsQuery, getWebsiteNodesQuery, getWebsiteQuery} from "@/api/api";
 import WebsitesScreen from "@/pages/websites";
 import Website from "@/screens/website/Website";
 import {notConnected} from "@/utils/utils";
 import {useEffect} from "react";
 
-export default function WebsiteScreen({ website, nodes }) {
+export default function WebsiteScreen({ website, nodes, executions }) {
 
-    return <Website website={website} nodes={nodes} />;
+    return <Website website={website} nodes={nodes} executions={executions} />;
 }
 
 export async function getServerSideProps({ query }) {
@@ -19,5 +19,8 @@ export async function getServerSideProps({ query }) {
     const getNodes = await getWebsiteNodesQuery([ website.identifier ]);
     const nodes = getNodes?.data?.data?.nodes ?? null;
 
-    return { props: { website, nodes } };
+    const getExecutions = await getExecutionsQuery({ webPage: website.identifier });
+    const executions = getExecutions?.data?.data?.executions ?? null;
+
+    return { props: { website, nodes, executions } };
 }

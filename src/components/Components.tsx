@@ -134,3 +134,9 @@ export const RemoveIcon = styled.span`
     color: white;
   }
 `;
+
+export const Empty = styled.p`
+  color: black;
+  font-size: 18px;
+  font-weight: 400;
+`;

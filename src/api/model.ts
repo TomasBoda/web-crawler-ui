@@ -1,24 +1,37 @@
 import gql from "graphql-tag";
 
 export const GetExecutionsQuery = gql`
-    query executions($limit: Int, $offset: Int) {
-        executions(limit: $limit, offset: $offset) {
+    query executions($limit: Int, $offset: Int, $webPage: ID) {
+        executions(limit: $limit, offset: $offset, webPage: $webPage) {
             id
-            pageid
             timestamp
+            page {
+                identifier
+                label
+                url
+                regexp
+                tags
+                active
+                crawling
+                periodicity
+                timestamp
+            }
         }
     }
 `
 
 export const GetWebsitesQuery = gql`
-    query {
-        websites {
+    query websites($limit: Int, $offset: Int) {
+        websites(limit: $limit, offset: $offset) {
             identifier
             label
             url
             regexp
             tags
             active
+            crawling
+            periodicity
+            timestamp
         }
     }
 `
@@ -33,6 +46,8 @@ export const GetWebsiteQuery = gql`
             tags
             active
             crawling
+            periodicity
+            timestamp
         }
     }
 `;
@@ -79,6 +94,7 @@ export const GetWebsiteNodesQuery = gql`
             title
             url
             parentId
+            crawlTime
         }
     }
 `;
