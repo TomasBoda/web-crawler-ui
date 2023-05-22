@@ -8,7 +8,7 @@ export default function Menu() {
             <Item href="/">Dashboard</Item>
             <Item href="/websites">Websites</Item>
             <Item href="/executions">Executions</Item>
-            <ButtonItem href="/crawl">Crawl</ButtonItem>
+            <ButtonItem href="/crawl">New website</ButtonItem>
         </Container>
     )
 }

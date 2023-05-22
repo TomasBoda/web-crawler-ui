@@ -31,7 +31,7 @@ export default function Navigation({ hasNext }) {
         const queryOffset = parseInt(offset.toString());
 
         router.replace({
-            pathname: router.pathname,
+            pathname: router.asPath.split("?")[0],
             query: {
                 limit: queryLimit,
                 offset: queryOffset + 1
@@ -48,7 +48,7 @@ export default function Navigation({ hasNext }) {
         if (queryOffset === 0) return;
 
         router.replace({
-            pathname: router.pathname,
+            pathname: router.asPath.split("?")[0],
             query: {
                 limit: queryLimit,
                 offset: queryOffset - 1
@@ -59,8 +59,8 @@ export default function Navigation({ hasNext }) {
     return (
         <Container>
             <div />
-            {offset > 0 && <Button type="secondary" size="large" onClick={() => previousPage()}>Previous</Button>}
-            {hasNext && <Button type="primary" size="large" onClick={() => nextPage()}>Next</Button>}
+            <Button disabled={offset === 0} type="secondary" size="small" onClick={() => previousPage()}>Previous</Button>
+            <Button disabled={!hasNext} type="primary" size="small" onClick={() => nextPage()}>Next</Button>
         </Container>
     )
 }

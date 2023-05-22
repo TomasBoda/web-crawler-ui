@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import React from "react";
-import { Container, InputField, Panel, Heading, Text, TagList, TagItem, RemoveIcon, Label } from "@/components/Components";
+import { Container, InputField, Panel, Heading, Text, TagList, TagItem, RemoveIcon, Label, Empty } from "@/components/Components";
 import Title from "@/components/Title";
 import {Execution as ExecutionModel, Website} from "@/model/model";
 import {getDateTime, getFormattedURL} from "@/utils/utils";
@@ -9,25 +9,22 @@ import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import dynamic from "next/dynamic";
 import {
-    addWebsiteQuery,
     crawlWebsiteQuery,
     deleteWebsiteQuery,
     getWebsiteCrawlingQuery,
+    getWebsiteNodesQuery,
     updateWebsiteQuery
 } from "@/api/api";
-import {GraphData, GraphEdge, GraphNode} from "@/screens/website/components/Graph";
 import {useRouter} from "next/router";
 import {hideLoading, showLoading} from "@/components/Loading";
 import {showDialog} from "@/components/Dialog";
-import web from "react-use-measure/src/web";
-import {time} from "ionicons/icons";
 import Node from "@/screens/website/components/Node";
 import Execution from "@/screens/website/components/Execution";
+import Navigation from "@/components/Navigation";
 const Graph = dynamic(() => import("./components/Graph"), { ssr: false });
 
 interface Props {
     website: Website;
-    nodes: any[];
     executions: ExecutionModel[];
 }
 
@@ -35,10 +32,15 @@ export default function Website(props: Props) {
 
     const router = useRouter();
 
-    const { website, nodes, executions } = props;
+    const { website, executions } = props;
 
     const [showingInfo, setShowingInfo] = useState(false);
+    const [mode, setMode] = useState("nodes");
     const [updated, setUpdated] = useState(false);
+
+    const [nodes, setNodes] = useState(null);
+    const [skip, setSkip] = useState(0);
+    const limit = 10;
 
     const [url, setUrl] = useState(website.url);
     const [label, setLabel] = useState(website.label);
@@ -50,15 +52,20 @@ export default function Website(props: Props) {
     const [crawling, setCrawling] = useState(website.crawling);
     const [timestamp, setTimestamp] = useState(website.timestamp);
 
-    const [mode, setMode] = useState("nodes");
-
     let crawlingInterval;
 
     useEffect(() => {
         startCheckingCrawling();
+        loadNodes();
 
         return () => clearInterval(crawlingInterval);
     }, []);
+
+    async function loadNodes() {
+        const getNodes = await getWebsiteNodesQuery({ webPages: [ website.identifier ] });
+        const nodes = getNodes?.data?.data?.nodes ?? null;
+        setNodes(nodes);
+    }
 
     function startCheckingCrawling() {
         crawlingInterval = setInterval(async () => {
@@ -150,6 +157,7 @@ export default function Website(props: Props) {
 
     async function crawlWebsite() {
         await crawlWebsiteQuery(website.id ?? website.identifier);
+        router.reload();
     }
 
     function tryDeleteWebsite() {
@@ -206,6 +214,34 @@ export default function Website(props: Props) {
         }
     }
 
+    function getPaginatedNodes(): any[] {
+        return nodes.slice(skip * limit, skip * limit + limit);
+    }
+
+    function nextNodePage(): void {
+        setSkip(skip + 1);
+    }
+
+    function previousNodePage(): void {
+        setSkip(skip - 1);
+    }
+
+    function getNodePage(): number {
+        return skip + 1;
+    }
+
+    function getTotalNodePages(): number {
+        return Math.trunc(nodes.length / limit) + 1;
+    }
+
+    function hasNextNodePage(): boolean {
+        return getPaginatedNodes().length === limit;
+    }
+
+    function hasPreviousNodePage(): boolean {
+        return skip > 0;
+    }
+
     function addTag(event) {
         if (event.key !== "Enter" || tag.trim() === "" || tags.includes(tag.trim().toLowerCase())) {
             return;
@@ -229,7 +265,7 @@ export default function Website(props: Props) {
             </Title>
 
             <ButtonBar>
-                <Button type="primary" size="small" onClick={() => tryCrawlWebsite()}>Crawl</Button>
+                <Button disabled={crawling} type="primary" size="small" onClick={() => tryCrawlWebsite()}>Crawl</Button>
                 <Button type="warn" size="small" onClick={() => tryDeleteWebsite()}>Delete</Button>
             </ButtonBar>
 
@@ -245,7 +281,7 @@ export default function Website(props: Props) {
                 </Crawling>
 
                 <Label onClick={() => setShowingInfo(!showingInfo)}>
-                    {showingInfo ? "Hide website information" : "Website information"}
+                    {showingInfo ? "Hide website information" : "Show website information"}
                 </Label>
 
                 {showingInfo &&
@@ -288,11 +324,9 @@ export default function Website(props: Props) {
                             <Toggle toggled={active} onToggle={() => setActive(!active)}/>
                         </Table>
 
-                        {updated &&
-                            <ButtonBar>
-                                <Button type="primary" size="small" onClick={() => updateWebsite()}>Update</Button>
-                            </ButtonBar>
-                        }
+                        <ButtonBar>
+                            <Button disabled={!updated} type="primary" size="small" onClick={() => updateWebsite()}>Update</Button>
+                        </ButtonBar>
                     </Content>
                 }
             </Panel>
@@ -303,27 +337,36 @@ export default function Website(props: Props) {
             </ButtonBar>
 
             {mode === "graph" &&
-                <GraphPanel>
-                    <Heading>Loading graph...</Heading>
-                    <Graph nodes={nodes}/>
+                <GraphPanel compact={nodes === null}>
+                    <Heading>Nodes Graph</Heading>
+                    {<Empty>Loading graph...</Empty>}
+                    {nodes && <Graph nodes={nodes}/>}
                 </GraphPanel>
             }
 
             {mode === "nodes" &&
-                <NodesPanel>
+                <Panel fullWidth>
                     <Heading>List of crawled nodes</Heading>
-                    <List>
-                        {nodes.map(node => <Node node={node} />)}
-                    </List>
-                </NodesPanel>
+                    {!nodes && <Empty>Loading nodes...</Empty>}
+
+                    {nodes && <List>{getPaginatedNodes().map(node => <Node node={node} />)}</List>}
+                    {nodes && nodes.length === 0 && <Empty>No nodes</Empty>}
+
+                    {nodes && nodes.length > 0 && <Empty style={{ marginTop: "30px" }}>Page {getNodePage()} / {getTotalNodePages()}</Empty>}
+                    {nodes && nodes.length > 0 &&
+                        <ButtonBar>
+                            <Button disabled={!hasPreviousNodePage()} type="secondary" size="small" onClick={previousNodePage}>Previous</Button>
+                            <Button disabled={!hasNextNodePage()} type="primary" size="small" onClick={nextNodePage}>Next</Button>
+                        </ButtonBar>
+                    }
+                </Panel>
             }
 
-            <ExecutionsPanel>
+            <Panel fullWidth>
                 <Heading>Executions</Heading>
-                <List>
-                    {executions.map(execution => <Execution execution={execution} />)}
-                </List>
-            </ExecutionsPanel>
+                <List>{executions.map(execution => <Execution execution={execution} />)}</List>
+                {executions.length === 0 && <Empty>No executions</Empty>}
+            </Panel>
         </Container>
     )
 }
@@ -383,19 +426,9 @@ const ButtonBar = styled.div`
 const GraphPanel = styled(Panel)`
   width: 100%;
   max-width: 100%;
-  height: 700px;
+  height: ${props => props.compact ? "auto" : "700px"};
   
   position: relative;
-`;
-
-const ExecutionsPanel = styled(Panel)`
-  width: 100%;
-  max-width: 100%;
-`;
-
-const NodesPanel = styled(Panel)`
-  width: 100%;
-  max-width: 100%;
 `;
 
 const List = styled.div`

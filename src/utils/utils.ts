@@ -49,3 +49,11 @@ export function getDateTime(dateTime: string) {
 
     return `${hours}:${minutes}:${seconds} | ${day}.${month}.${year}`;
 }
+
+export function areEmpty(...values: string[]): boolean {
+    for (const value of values) {
+        if (value.trim() === "") return true;
+    }
+
+    return false;
+}

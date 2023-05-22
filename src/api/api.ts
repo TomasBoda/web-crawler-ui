@@ -1,12 +1,6 @@
 import axios from "axios";
 import { print } from "graphql";
-import {
-    AddWebsiteQuery, DeleteWebsiteQuery, GetExecutionsQuery, GetWebsiteCrawlingQuery,
-    GetWebsiteNodesQuery,
-    GetWebsiteQuery,
-    GetWebsitesQuery,
-    UpdateWebsiteQuery
-} from "@/api/model";
+import { AddWebsiteQuery, DeleteWebsiteQuery, GetExecutionsQuery, GetWebsiteCrawlingQuery,  GetWebsiteNodesQuery, GetWebsiteQuery, GetWebsitesQuery, UpdateWebsiteQuery } from "@/api/model";
 import { Website } from "@/model/model";
 
 export const API_URL = "http://195.113.19.168:3000/graphql";
@@ -53,9 +47,10 @@ export async function deleteWebsiteQuery(id: string) {
 }
 
 export async function crawlWebsiteQuery(id: string) {
-    return await query(UpdateWebsiteQuery, { id });
+    return await query(UpdateWebsiteQuery, { id, active: true });
 }
 
-export async function getWebsiteNodesQuery(webPages: string[]) {
-    return await query(GetWebsiteNodesQuery, { webPages });
+interface getWebsiteNodesProps { webPages: string[], limit?: number, offset?: number };
+export async function getWebsiteNodesQuery(props: getWebsiteNodesProps) {
+    return await query(GetWebsiteNodesQuery, props);
 }

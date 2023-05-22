@@ -5,6 +5,7 @@ import {hideLoading, showLoading} from "@/components/Loading";
 import {addWebsiteQuery} from "@/api/api";
 import {hideDialog, showDialog} from "@/components/Dialog";
 import {useRouter} from "next/router";
+import {getDateTime} from "@/utils/utils";
 
 export default function Node({ node }) {
 
@@ -37,7 +38,7 @@ export default function Node({ node }) {
     return (
         <Container>
             <Value>{title ?? "No title"}</Value>
-            <Value>{crawlTime ?? "Not crawled"}</Value>
+            <Value>{crawlTime ? getDateTime(crawlTime) : "Not crawled"}</Value>
             <Value>{url}</Value>
             <Button type="primary" size="small" onClick={() => tryAddWebsite()}>Crawl</Button>
         </Container>
@@ -48,7 +49,7 @@ const Container = styled.div`
   width: 100%;
 
   display: grid;
-  grid-template-columns: 200px 100px 1fr auto;
+  grid-template-columns: 150px 200px 1fr auto;
   gap: 15px;
   align-items: center;
 

@@ -2,8 +2,19 @@ import {getExecutionsQuery, getWebsitesQuery} from "@/api/api";
 import Dashboard from "@/screens/dashboard/Dashboard";
 import {notConnected} from "@/utils/utils";
 import web from "react-use-measure/src/web";
+import {useEffect} from "react";
 
 function DashboardScreen({ websitesCount, executionsCount }) {
+
+    useEffect(() => {
+        get();
+    }, []);
+
+    async function get() {
+        const response = await getWebsitesQuery();
+        console.log(response);
+    }
+
     return (
         <Dashboard
             websitesCount={websitesCount}

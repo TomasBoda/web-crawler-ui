@@ -19,6 +19,23 @@ export default function Dialog() {
     )
 }
 
+export function showEmptyDialog(...fields: string[]) {
+    const valueString = fields.map(field => `'${field}'`).join(", ");
+
+    showDialog({
+       heading: "Values cannot be empty",
+       text: `Values ${valueString} cannot be empty`,
+        primary: {
+           label: "Okay",
+            onClick: () => {}
+        },
+        secondary: {
+           label: "Cancel",
+            onClick: () => {}
+        }
+    });
+}
+
 export function showDialog({ heading, text, primary, secondary }) {
     let dialog = document.getElementById("dialog");
 

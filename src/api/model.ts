@@ -88,8 +88,8 @@ export const DeleteWebsiteQuery = gql`
 `;
 
 export const GetWebsiteNodesQuery = gql`
-    query nodes($webPages: [ID!]!) {
-        nodes(webPages: $webPages) {
+    query nodes($webPages: [ID!]!, $limit: Int, $offset: Int) {
+        nodes(webPages: $webPages, limit: $limit, offset: $offset) {
             id
             title
             url

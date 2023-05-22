@@ -8,10 +8,11 @@ import { addWebsiteQuery } from "@/api/api";
 import { Website } from "@/model/model";
 import {useRouter} from "next/router";
 import {hideLoading, showLoading} from "@/components/Loading";
-import {showDialog} from "@/components/Dialog";
+import {showDialog, showEmptyDialog} from "@/components/Dialog";
+import {areEmpty} from "@/utils/utils";
 
 const defaultValues: Website = {
-    url: "https://tomasboda.dev",
+    url: "",
     label: "",
     regexp: ".*",
     periodicity: 3600,
@@ -34,14 +35,22 @@ export default function Crawl() {
     const [active, setActive] = useState(defaultValues.active);
 
     useEffect(() => {
-        const { domainUrl } = router.query;
-        if (!domainUrl) return;
-
-        setUrl(decodeURI(domainUrl.toString()));
+        setUrl(getQueryDomainURL());
     }, []);
+
+    function getQueryDomainURL(): string {
+        const { domainUrl } = router.query;
+        return domainUrl ? decodeURI(domainUrl.toString()) : "";
+    }
 
     async function addWebsite() {
         showLoading();
+
+        if (areEmpty(url)) {
+            hideLoading();
+            showEmptyDialog("url");
+            return;
+        }
 
         const params = { label, url, regexp: encodeURIComponent(regexp), periodicity, tags, active };
         const response = await addWebsiteQuery(params);
@@ -112,7 +121,7 @@ export default function Crawl() {
                 </InputFormHorizontal>
 
                 <Label onClick={() => setAdvanced(!advanced)}>
-                    {advanced ? "Hide advanced options" : "Advanced options"}
+                    {advanced ? "Hide advanced options" : "Show advanced options"}
                 </Label>
             </Panel>
 

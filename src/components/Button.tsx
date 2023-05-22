@@ -11,6 +11,7 @@ interface Props {
     type?: ButtonType;
     size?: ButtonSize;
     onClick?: Function;
+    disabled?: boolean;
 }
 
 export default function Button(props: Props) {
@@ -20,6 +21,7 @@ export default function Button(props: Props) {
     const type = props.type ?? "primary";
     const size = props.size ?? "small";
     const onClick = props.onClick;
+    const disabled = props.disabled ?? false;
 
     if (href) {
         return (
@@ -27,7 +29,8 @@ export default function Button(props: Props) {
                 id={props.id}
                 type={type}
                 size={size}
-                href={href}
+                href={disabled ? null : href}
+                disabled={disabled}
             >
                 {children}
             </StyledLinkButton>
@@ -39,7 +42,8 @@ export default function Button(props: Props) {
             id={props.id}
             type={type}
             size={size}
-            onClick={onClick}
+            onClick={disabled ? null : onClick}
+            disabled={disabled}
         >
             {children}
         </StyledButton>
@@ -75,8 +79,13 @@ const ButtonStyles = css`
   
   transition: all 150ms;
   
+  border: ${props => props.disabled && "3px solid rgb(220, 220, 220)"};
+  background-color: ${props => props.disabled && "transparent"};
+  color: ${props => props.disabled && "rgb(200, 200, 200)"};
+  cursor: ${props => props.disabled && "not-allowed"};
+  
   &:hover {
-    opacity: 0.8;
+    opacity: ${props => props.disabled ? "1.0" : "0.8"};
   }
 `;
 

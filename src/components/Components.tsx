@@ -55,7 +55,7 @@ export const InputField = styled.input`
 
 export const Panel = styled.div`
   width: 100%;
-  max-width: 900px;
+  max-width: ${props => props.fullWidth ? "100%" : "900px"};
 
   display: flex;
   flex-direction: column;
