@@ -7,16 +7,16 @@ function WebsitesScreen({ websites }) {
 }
 
 export async function getServerSideProps({ query, req, params }) {
-    const { limit, offset } = query;
+    const { limit, offset, sortBy, sortOrder } = query;
 
-    if (!limit || !offset) {
-        return redirect("/websites?limit=10&offset=0");
+    if (!limit || !offset || !sortBy || !sortOrder) {
+        return redirect("/websites?limit=10&offset=0&sortBy=timestamp&sortOrder=ASC");
     }
 
     const queryLimit = limit ? parseInt(limit) : 10;
     const queryOffset = offset ? parseInt(offset) * limit : 0;
 
-    const response = await getWebsitesQuery({ limit: queryLimit, offset: queryOffset });
+    const response = await getWebsitesQuery({ limit: queryLimit, offset: queryOffset, sortBy, sortOrder });
 
     if (response === null) return notConnected();
 

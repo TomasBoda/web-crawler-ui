@@ -16,4 +16,5 @@ export interface Execution {
     id?: string;
     page?: Website;
     timestamp: string;
+    crawled?: number;
 }

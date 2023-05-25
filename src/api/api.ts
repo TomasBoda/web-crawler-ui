@@ -24,7 +24,7 @@ export async function getWebsiteCrawlingQuery(webPageId: string) {
     return await query(GetWebsiteCrawlingQuery, { webPageId });
 }
 
-interface getWebsitesProps { limit?: number; offset?: number; }
+interface getWebsitesProps { limit?: number; offset?: number; sortBy?: string; sortOrder?: string; }
 export async function getWebsitesQuery(props: getWebsitesProps = {}) {
     return await query(GetWebsitesQuery, props);
 }

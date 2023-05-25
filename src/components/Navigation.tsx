@@ -33,6 +33,7 @@ export default function Navigation({ hasNext }) {
         router.replace({
             pathname: router.asPath.split("?")[0],
             query: {
+                ...router.query,
                 limit: queryLimit,
                 offset: queryOffset + 1
             }
@@ -50,6 +51,7 @@ export default function Navigation({ hasNext }) {
         router.replace({
             pathname: router.asPath.split("?")[0],
             query: {
+                ...router.query,
                 limit: queryLimit,
                 offset: queryOffset - 1
             }

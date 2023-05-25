@@ -1,11 +1,11 @@
 import styled from "styled-components";
 import { useEffect } from "react";
-import { getFormattedURL } from "@/utils/utils";
+import {getDateTime, getFormattedURL} from "@/utils/utils";
 import Button from "@/components/Button";
 
 export default function Record({ website }) {
 
-    const { identifier, label, url, regexp, periodicity, tags, active } = website;
+    const { identifier, label, url, regexp, periodicity, tags, active, timestamp, crawling } = website;
 
     function getLabel(): string {
         return label.trim() === "" ? "No label" : label;
@@ -21,7 +21,13 @@ export default function Record({ website }) {
             <Value>{getFormattedURL(url)}</Value>
             <Value>{getLabel()}</Value>
             <Value>{periodicity} seconds</Value>
+            <Value>{getDateTime(timestamp)}</Value>
+
+            <Active active={crawling} />
+            <Value>{crawling ? "Crawling..." : "Idle"}</Value>
+
             <Value>{getTags()}</Value>
+
             <Button type="primary" size="small" href={`/websites/${identifier}`}>Detail</Button>
         </Container>
     )
@@ -31,7 +37,7 @@ const Container = styled.div`
   width: 100%;
   
   display: grid;
-  grid-template-columns: auto 250px 150px 150px 1fr auto;
+  grid-template-columns: auto 200px 200px 150px 200px auto 100px 1fr auto;
   gap: 15px;
   align-items: center;
   

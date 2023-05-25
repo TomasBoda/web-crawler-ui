@@ -4,7 +4,7 @@ import Toggle from "@/components/Toggle";
 import Title from "@/components/Title";
 import { Container, Label, Heading, Text, InputField, Panel, TagList, TagItem, RemoveIcon } from "@/components/Components";
 import Button from "@/components/Button";
-import { addWebsiteQuery } from "@/api/api";
+import {addWebsiteQuery, getExecutionsQuery} from "@/api/api";
 import { Website } from "@/model/model";
 import {useRouter} from "next/router";
 import {hideLoading, showLoading} from "@/components/Loading";

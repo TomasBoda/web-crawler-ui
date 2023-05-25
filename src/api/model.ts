@@ -5,6 +5,8 @@ export const GetExecutionsQuery = gql`
         executions(limit: $limit, offset: $offset, webPage: $webPage) {
             id
             timestamp
+            crawled
+            finished
             page {
                 identifier
                 label
@@ -21,8 +23,8 @@ export const GetExecutionsQuery = gql`
 `
 
 export const GetWebsitesQuery = gql`
-    query websites($limit: Int, $offset: Int) {
-        websites(limit: $limit, offset: $offset) {
+    query websites($limit: Int, $offset: Int, $sortBy: String, $sortOrder: String) {
+        websites(limit: $limit, offset: $offset, sortBy: $sortBy, sortOrder: $sortOrder) {
             identifier
             label
             url
