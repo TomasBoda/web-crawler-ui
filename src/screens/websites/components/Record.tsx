@@ -37,7 +37,7 @@ const Container = styled.div`
   width: 100%;
   
   display: grid;
-  grid-template-columns: auto 200px 200px 150px 200px auto 100px 1fr auto;
+  grid-template-columns: auto 150px 150px 100px 150px auto 65px 1fr auto;
   gap: 15px;
   align-items: center;
   
@@ -57,9 +57,13 @@ const Active = styled.span`
   background-color: ${props => props.active ? "green" : "red"};
 `;
 
-const Value = styled.h3`
+const Value = styled.p`
   color: black;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
-  line-height: 100%;
+  line-height: 150%;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;

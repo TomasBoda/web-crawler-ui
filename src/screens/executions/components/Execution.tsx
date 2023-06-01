@@ -11,10 +11,10 @@ export default function Execution({ execution }) {
     return (
         <Container>
             <Active active={finished} />
-            <Id>{id}</Id>
-            <Timestamp>{getDateTime(timestamp)}</Timestamp>
-            <Crawled>{crawled} crawled nodes</Crawled>
-            <URL>{getFormattedURL(page.url)}</URL>
+            <Value>{id}</Value>
+            <Value>{getDateTime(timestamp)}</Value>
+            <Value>{crawled} crawled nodes</Value>
+            <Value>{getFormattedURL(page.url)}</Value>
             <Button type="secondary" size="small" href={websiteUrl}>See website</Button>
         </Container>
     )
@@ -24,7 +24,7 @@ const Container = styled.div`
   width: 100%;
   
   display: grid;
-  grid-template-columns: auto 200px 250px 200px 1fr auto;
+  grid-template-columns: auto 120px 150px 150px 1fr auto;
   gap: 15px;
   align-items: center;
   
@@ -44,26 +44,12 @@ const Active = styled.span`
   background-color: ${props => props.active ? "green" : "red"};
 `;
 
-const Id = styled.p`
+const Value = styled.p`
   color: black;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 500;
-`;
 
-const Timestamp = styled.p`
-  color: black;
-  font-size: 16px;
-  font-weight: 500;
-`;
-
-const Crawled = styled.p`
-  color: black;
-  font-size: 16px;
-  font-weight: 500;
-`;
-
-const URL = styled.p`
-  color: black;
-  font-size: 16px;
-  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;

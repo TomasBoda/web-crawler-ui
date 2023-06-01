@@ -49,7 +49,7 @@ const Container = styled.div`
   width: 100%;
 
   display: grid;
-  grid-template-columns: 150px 200px 1fr auto;
+  grid-template-columns: 200px 150px 1fr auto;
   gap: 15px;
   align-items: center;
 
@@ -62,7 +62,11 @@ const Container = styled.div`
 
 const Value = styled.p`
   color: black;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 100%;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;

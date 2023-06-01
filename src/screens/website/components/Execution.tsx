@@ -31,7 +31,7 @@ const Container = styled.div`
 
 const Value = styled.p`
   color: black;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 100%;
 `;
