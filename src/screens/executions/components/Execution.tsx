@@ -10,11 +10,11 @@ export default function Execution({ execution }) {
 
     return (
         <Container>
-            <Active active={finished} />
+            <Active active={finished} title={finished ? "Successful" : "Interrupted"} />
+            <Value>{getFormattedURL(page.url)}</Value>
             <Value>{id}</Value>
             <Value>{getDateTime(timestamp)}</Value>
             <Value>{crawled} crawled nodes</Value>
-            <Value>{getFormattedURL(page.url)}</Value>
             <Button type="secondary" size="small" href={websiteUrl}>See website</Button>
         </Container>
     )
@@ -24,7 +24,7 @@ const Container = styled.div`
   width: 100%;
   
   display: grid;
-  grid-template-columns: auto 120px 150px 150px 1fr auto;
+  grid-template-columns: auto 200px 120px 150px 1501fr auto;
   gap: 15px;
   align-items: center;
   

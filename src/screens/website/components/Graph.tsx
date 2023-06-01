@@ -22,11 +22,14 @@ export default function Graph({ nodes }) {
 
     const graphData = getGraphData();
 
+    const actives = nodes.filter(node => node.crawlTime).map(node => node.id);
+
     function getGraphData(): GraphData {
         function getGraphNodes(): GraphNode[] {
             return nodes.map(node => ({
                 id: node.id,
-                label: node.title ?? "No title"
+                label: node.title ?? "No title",
+                active: false
             }));
         }
 
@@ -55,6 +58,7 @@ export default function Graph({ nodes }) {
                 edgeInterpolation="radialOut2d"
                 nodes={graphData.nodes}
                 edges={graphData.edges}
+                actives={actives}
             />
         </Container>
     )

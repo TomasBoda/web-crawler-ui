@@ -5,6 +5,7 @@ import {useEffect} from "react";
 import {getWebsitesQuery} from "@/api/api";
 import {notConnected} from "@/utils/utils";
 import Button from "@/components/Button";
+import Spinner from "@/components/Spinner";
 
 export default function Dashboard({ websitesCount, executionsCount }) {
 
@@ -21,8 +22,8 @@ export default function Dashboard({ websitesCount, executionsCount }) {
     const Links = () => {
         return (
             <ButtonPanel>
-                <Button type="primary" size="small" href="/websites">Websites</Button>
-                <Button type="primary" size="small" href="/executions">Executions</Button>
+                <Button type="primary" size="small" href="/websites">See websites</Button>
+                <Button type="primary" size="small" href="/executions">See executions</Button>
             </ButtonPanel>
         )
     }

@@ -9,6 +9,9 @@ export default function Menu() {
             <Item href="/websites">Websites</Item>
             <Item href="/executions">Executions</Item>
             <ButtonItem href="/crawl">New website</ButtonItem>
+
+            <FillSpace />
+            <Credits>Made by<br />Tomas Boda & David Kroupa</Credits>
         </Container>
     )
 }
@@ -81,4 +84,17 @@ const ButtonItem = styled(Link)`
     background-color: black;
     border: 2px solid white;
   }
+`;
+
+const FillSpace = styled.div`
+  flex: 1;
+`;
+
+const Credits = styled.p`
+  color: white;
+  font-size: 14px;
+  font-weight: 200;
+  line-height: 200%;
+  
+  opacity: 0.7;
 `;

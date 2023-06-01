@@ -60,6 +60,7 @@ export default function Navigation({ hasNext }) {
 
     return (
         <Container>
+            <PageNumber>Page {offset + 1}</PageNumber>
             <div />
             <Button disabled={offset === 0} type="secondary" size="small" onClick={() => previousPage()}>Previous</Button>
             <Button disabled={!hasNext} type="primary" size="small" onClick={() => nextPage()}>Next</Button>
@@ -71,8 +72,15 @@ const Container = styled.div`
   width: 100%;
   
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: auto 1fr auto auto;
   gap: 10px;
   
   margin-top: 50px;
+`;
+
+const PageNumber = styled.p`
+  color: black;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 100%;
 `;

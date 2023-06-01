@@ -37,9 +37,10 @@ export default function Node({ node }) {
 
     return (
         <Container>
-            <Value>{title ?? "No title"}</Value>
+            <Active active={crawlTime} title={crawlTime ? "Crawled" : "Not crawled"} />
+            <Value title="URL title">{title ?? "No title"}</Value>
             <Value>{crawlTime ? getDateTime(crawlTime) : "Not crawled"}</Value>
-            <Value>{url}</Value>
+            <Value title="Node URL">{url}</Value>
             <Button type="primary" size="small" onClick={() => tryAddWebsite()}>Crawl</Button>
         </Container>
     )
@@ -49,7 +50,7 @@ const Container = styled.div`
   width: 100%;
 
   display: grid;
-  grid-template-columns: 200px 150px 1fr auto;
+  grid-template-columns: auto 200px 150px 1fr auto;
   gap: 15px;
   align-items: center;
 
@@ -69,4 +70,13 @@ const Value = styled.p`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+`;
+
+const Active = styled.span`
+  width: 10px;
+  height: 10px;
+
+  border-radius: 5px;
+
+  background-color: ${props => props.active ? "green" : "red"};
 `;

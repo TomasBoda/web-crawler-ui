@@ -17,16 +17,16 @@ export default function Record({ website }) {
 
     return (
         <Container>
-            <Active active={active} title="Active (website is crawled actively)" />
-            <Value>{getFormattedURL(url)}</Value>
-            <Value>{getLabel()}</Value>
-            <Value>{periodicity} seconds</Value>
-            <Value>{getDateTime(timestamp)}</Value>
+            <Active active={active} title={active ? "Active - crawled regularly" : "Not active"} />
+            <Value title="Website URL">{getFormattedURL(url)}</Value>
+            <Value title="Website label">{getLabel()}</Value>
+            <Value title="Crawl periodicity">{periodicity} seconds</Value>
+            <Value title="Date and time of last crawl">{getDateTime(timestamp)}</Value>
 
             <Active active={crawling} />
             <Value>{crawling ? "Crawling..." : "Idle"}</Value>
 
-            <Value>{getTags()}</Value>
+            <Value title="List of tags">{getTags()}</Value>
 
             <Button type="primary" size="small" href={`/websites/${identifier}`}>Detail</Button>
         </Container>

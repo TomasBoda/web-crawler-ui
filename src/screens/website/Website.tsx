@@ -21,6 +21,7 @@ import {showDialog} from "@/components/Dialog";
 import Node from "@/screens/website/components/Node";
 import Execution from "@/screens/website/components/Execution";
 import Navigation from "@/components/Navigation";
+import Spinner from "@/components/Spinner";
 const Graph = dynamic(() => import("./components/Graph"), { ssr: false });
 
 interface Props {
@@ -339,7 +340,7 @@ export default function Website(props: Props) {
             {mode === "graph" &&
                 <GraphPanel compact={nodes === null}>
                     <Heading>Nodes Graph</Heading>
-                    {<Empty>Loading graph...</Empty>}
+                    <Spinner />
                     {nodes && <Graph nodes={nodes}/>}
                 </GraphPanel>
             }
@@ -347,7 +348,7 @@ export default function Website(props: Props) {
             {mode === "nodes" &&
                 <Panel fullWidth>
                     <Heading>List of crawled nodes</Heading>
-                    {!nodes && <Empty>Loading nodes...</Empty>}
+                    {!nodes && <Spinner />}
 
                     {nodes && <List>{getPaginatedNodes().map(node => <Node node={node} />)}</List>}
                     {nodes && nodes.length === 0 && <Empty>No nodes</Empty>}
